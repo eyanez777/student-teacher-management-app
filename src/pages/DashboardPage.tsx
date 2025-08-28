@@ -6,7 +6,6 @@ import { Box, Typography, Accordion, AccordionSummary, AccordionDetails, Divider
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Sidebar from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
-import { isTokenExpired } from '../utils/token-utils';
 
 
 const DashboardPage: React.FC = () => {
@@ -14,14 +13,11 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, token } = useSelector((state: RootState) => state.auth);
 
-//   useEffect(() => {
-//     if (token && isTokenExpired(token)) {
-//       localStorage.removeItem('token');
-//       localStorage.removeItem('user');
-//       dispatch({ type: 'auth/logout' });
-//       navigate('/login', { replace: true });
-//     }
-//   }, [token, dispatch, navigate]);
+    useEffect(() => {
+        if (!token) {
+        navigate('/login');
+        }
+    }, [token, navigate]);
 
   return (
     <Box display="flex">

@@ -5,7 +5,7 @@ export const updateCourseUsers = createAsyncThunk(
     try {
       const response = await api.put(`/courses/${id}/users`, { userIds });
       console.log('Respuesta de asociar usuarios:', response);
-      return response.data;
+      return response.data.payload;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || 'Error al asociar usuarios');
     }
