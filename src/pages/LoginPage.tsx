@@ -12,6 +12,7 @@ const LoginPage = () => {
   const { loading, error, token, user } = useSelector((state: RootState) => state.auth);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [redirecting, setRedirecting] = useState(false);
 
   // Hidratar auth desde localStorage al cargar la app
   useEffect(() => {
@@ -30,7 +31,12 @@ const LoginPage = () => {
   }, [dispatch, token, user]);
   useEffect(() => {
     if (token) {
-      navigate('/dashboard');
+      setRedirecting(true);
+      // Pequeño timeout para mostrar el spinner antes de navegar
+      setTimeout(() => {
+        navigate('/dashboard');
+        // No es necesario setRedirecting(false) porque el componente se desmonta al navegar
+      }, 1200);
     }
   }, [token, navigate]);
 
@@ -39,6 +45,13 @@ const LoginPage = () => {
     dispatch(login({ email, password }));
   };
 
+  if (redirecting) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
   return (
     <Box maxWidth={400} mx="auto" mt={10} p={3} boxShadow={3} borderRadius={2}>
       <Typography variant="h5" mb={2}>Iniciar Sesión</Typography>

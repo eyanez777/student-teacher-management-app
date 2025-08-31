@@ -16,15 +16,21 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  IconButton,
+  Menu,
+  MenuItem
 } from "@mui/material";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCourses, createCourse, updateCourse, deleteCourse, updateCourseUsers } from "../features/courses/coursesSlice";
 import { fetchUsers } from "../features/users/usersSlice";
 import type { RootState, AppDispatch } from "../app/store";
+import { useNavigate } from "react-router-dom";
 
 const AdminCoursesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { courses, loading, error } = useSelector((state: RootState) => state.courses);
   const { users } = useSelector((state: RootState) => state.users);
   // Estado para modal de asociación de usuarios
@@ -195,20 +201,49 @@ const AdminCoursesPage: React.FC = () => {
     {
       field: "actions",
       headerName: "Acciones",
-      width: 380,
-      renderCell: (params: any) => (
-        <Stack direction="row" spacing={3} margin={1}>
-          <Button size="small" variant="outlined" onClick={() => handleOpenEdit(params.row)}>
-            Editar
-          </Button>
-          <Button size="small" color="error" variant="outlined" onClick={() => handleOpenDelete(params.row)}>
-            Eliminar
-          </Button>
-          <Button size="small" variant="contained" color="secondary" onClick={() => handleOpenAssociate(params.row)}>
-            Asociar Usuarios
-          </Button>
-        </Stack>
-      ),
+      width: 120,
+      sortable: false,
+      renderCell: (params: any) => {
+        const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+        const open = Boolean(anchorEl);
+        const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+          setAnchorEl(event.currentTarget);
+        };
+        const handleMenuClose = () => {
+          setAnchorEl(null);
+        };
+        const handleEdit = () => {
+          handleOpenEdit(params.row);
+          handleMenuClose();
+        };
+        const handleDelete = () => {
+          handleOpenDelete(params.row);
+          handleMenuClose();
+        };
+        const handleAssociate = () => {
+          handleOpenAssociate(params.row);
+          handleMenuClose();
+        };
+        return (
+          <>
+            <IconButton size="small" onClick={handleMenuOpen} aria-controls={open ? 'actions-menu' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="actions-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              <MenuItem onClick={handleEdit}>Editar</MenuItem>
+              <MenuItem onClick={handleDelete}>Eliminar</MenuItem>
+              <MenuItem onClick={handleAssociate}>Asociar Usuarios</MenuItem>
+            </Menu>
+          </>
+        );
+      },
     },
   ];
 
@@ -272,31 +307,44 @@ const AdminCoursesPage: React.FC = () => {
           ¡Usuarios asociados correctamente!
         </MuiAlert>
       </Snackbar>
-      <Typography variant="h4" mb={2}>
-        Gestión de Cursos (Admin)
-      </Typography>
-      <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={handleOpenCreate}>
-        Crear Curso
-      </Button>
+      
       {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
           <CircularProgress />
         </Box>
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
       ) : (
-        <DataGrid
-          rows={courses}
-          columns={columns}
-          disableRowSelectionOnClick
-          sx={{ sm:12,md: 6, lg:4 }}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 5, page: 0 },
-            },
-          }}
-          style={{ color: '#333', backgroundColor: '#f0f0f0' }}
-        />
+        <>
+          {error && <Alert severity="error">{error}</Alert>}
+          <Typography variant="h4" mb={2}>
+            Gestión de Cursos (Admin)
+          </Typography>
+          <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={handleOpenCreate}>
+            Crear Curso
+          </Button>
+          <Box position="relative">
+            <DataGrid
+              rows={courses}
+              columns={columns}
+              disableRowSelectionOnClick
+              sx={{ sm:12,md: 6, lg:4, backgroundColor: '#f0f0f0' }}
+              initialState={{
+                pagination: {
+                  paginationModel: { pageSize: 5, page: 0 },
+                },
+              }}
+              style={{ color: '#333' }}
+            />
+          </Box>
+
+          <Button
+                      
+                      variant="outlined"
+                      sx={{ mb: 2, marginTop:1.5 }}
+                      onClick={() => navigate("/dashboard")}
+                    >
+                      Volver
+                    </Button>
+        </>
       )}
 
       {/* Modal de detalle de curso */}

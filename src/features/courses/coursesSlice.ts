@@ -55,7 +55,7 @@ export const deleteCourse = createAsyncThunk('courses/deleteCourse', async (id: 
 export const fetchCourses = createAsyncThunk('courses/fetchCourses', async (_, { rejectWithValue }) => {
   try {
     // Simular delay de 3 segundos para mostrar el spinner
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 2500));
     const response = await api.get('/courses');
     return response.data;
   } catch (err: any) {
