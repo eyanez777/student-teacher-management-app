@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { TextField, Button, Box, Typography, Alert, CircularProgress } from '@mui/material';
+import { TextField, Button, Box, Typography, Alert, CircularProgress, Link } from '@mui/material';
+import ForgotPasswordDialog from '../components/ForgotPasswordDialog';
 import { login } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import type { RootState } from '../app/store';
@@ -13,6 +14,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [redirecting, setRedirecting] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   // Hidratar auth desde localStorage al cargar la app
   useEffect(() => {
@@ -74,6 +76,17 @@ const LoginPage = () => {
           margin="normal"
           required
         />
+        <Box mt={1} mb={1} textAlign="right">
+          <Link
+            component="button"
+            type="button"
+            variant="body2"
+            onClick={() => setForgotOpen(true)}
+            sx={{ p: 0, minWidth: 0 }}
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </Box>
         {error && <Alert severity="error">{error}</Alert>}
         <Box mt={2}>
           <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
@@ -81,6 +94,7 @@ const LoginPage = () => {
           </Button>
         </Box>
       </form>
+      <ForgotPasswordDialog open={forgotOpen} onClose={() => setForgotOpen(false)} />
     </Box>
   );
 };
